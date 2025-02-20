@@ -56,12 +56,19 @@ if ($confirmation -eq 'YES') {
     # Initialize the disk with GPT partition style
     Initialize-Disk -Number $disk.Number -PartitionStyle GPT
 
-    Write-Host "Drive $driveNumber has been initialized with a GPT partition style. The disk is now ready to use! NOTE: You may need to physically pull and reseat the drive before it will be storage pool ready."
+    Write-Host "`n"
+    Write-Host "Drive $driveNumber has been initialized with a GPT partition style. The disk is now ready to use!"
+    Write-Host "NOTE: You may need to physically pull and reseat the drive before it will be storage pool ready." -ForegroundColor Yellow
 } else {
     # Cancel the operation
     Write-Host "Operation cancelled. $driveNumber was not formatted."
 }
 
+# To pause for a specific number of seconds
+Start-Sleep -Seconds 5
+
 # Wait for user to press any key to exit
+Write-Host "`n"
+Write-Host "`n"
 Write-Host "Press any key to exit..."
 $x = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
