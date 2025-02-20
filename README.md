@@ -4,4 +4,6 @@ This script will automatically install SG_Format (sg3_utils) if it is not alread
 
 Some disks perform quickly, while others take hours to complete. I am not entirely sure of the reason behind this, but it seems to be a common experience according to others online. If a disk starts off fast and then appears to be "stuck" at a certain percentage, it is advisable to let it run until it either completes or fails.
 
+Download the PowerShell script, right click and run with PowerShell. You will prbably need to run it as an admin, and agree to running scripts the first time you run it.  Good Luck!
+
 ![image](https://github.com/user-attachments/assets/ef2a0b01-438f-47d8-9a5f-53d7602e8909)
