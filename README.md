@@ -16,14 +16,6 @@ A Windows PowerShell script designed to convert drives with unconventional block
 - **Performance**: Some drives convert quickly, while others may take hours. If a disk seems "stuck" at a certain percentage, allow it to run until it either completes or fails.
 - **Execution**: You may need to run the script as an administrator and approve the execution of scripts the first time you use it.
 
-## Usage Instructions
-
-1. **Download** the PowerShell script.
-2. Right-click the script file and select **Run with PowerShell**.
-3. Follow the prompts to select the drive you wish to convert.
-
-Good luck!
-
 
 ![image](https://github.com/user-attachments/assets/ef2a0b01-438f-47d8-9a5f-53d7602e8909)
 
