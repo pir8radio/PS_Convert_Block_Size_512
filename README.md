@@ -1,10 +1,29 @@
+# PS_Convert_Block_Size_512 Script
+
+## Overview
+
 A Windows PowerShell script designed to convert drives with unconventional block sizes, such as NetApp's 520-byte block size, to the standard 512-byte block size. This conversion enables the use of older JBOD-type RAID shelves with Windows and Windows Storage Pools.
 
-This script will automatically install SG_Format (sg3_utils) if it is not already installed, scan for available drives, and list them. You can then select the drive you wish to convert, and the script will format the drive from its current block size to 512 bytes and initialize the disk as GPT.
+## Features
 
-Some disks perform quickly, while others take hours to complete. I am not entirely sure of the reason behind this, but it seems to be a common experience according to others online. If a disk starts off fast and then appears to be "stuck" at a certain percentage, it is advisable to let it run until it either completes or fails.
+- Automatically installs **SG_Format (sg3_utils)** if it is not already installed.
+- Scans for available drives and lists them for selection.
+- Converts the selected drive's block size to **512 bytes**.
+- Initializes the disk as **GPT**.
 
-Download the PowerShell script, right-click and run it with PowerShell. You will probably need to run it as an administrator and agree to run scripts the first time you execute it. Good luck!
+## Notes
+
+- **Performance**: Some drives convert quickly, while others may take hours. If a disk seems "stuck" at a certain percentage, allow it to run until it either completes or fails.
+- **Execution**: You may need to run the script as an administrator and approve the execution of scripts the first time you use it.
+
+## Usage Instructions
+
+1. **Download** the PowerShell script.
+2. Right-click the script file and select **Run with PowerShell**.
+3. Follow the prompts to select the drive you wish to convert.
+
+Good luck!
+
 
 ![image](https://github.com/user-attachments/assets/ef2a0b01-438f-47d8-9a5f-53d7602e8909)
 
