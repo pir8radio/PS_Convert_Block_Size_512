@@ -1,14 +1,6 @@
 # Give me a star on github :-)
 # https://github.com/pir8radio/PS_Convert_Block_Size_512
 
-# Ensure script is running as Administrator
-if (-not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
-    Add-Type -AssemblyName System.Windows.Forms
-    [System.Windows.Forms.MessageBox]::Show("This script must be run as Administrator. Restarting with elevated privileges.")
-    Start-Process -FilePath "powershell.exe" -ArgumentList "-NoProfile -WindowStyle Hidden -File `"$PSCommandPath`"" -Verb RunAs
-    exit
-}
-
 # Function to check if sg_format is installed
 function Check-SGFormat {
     $sgFormatPath = Get-Command sg_format -ErrorAction SilentlyContinue
