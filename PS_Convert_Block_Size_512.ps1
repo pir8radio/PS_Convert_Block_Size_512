@@ -39,6 +39,9 @@ do {
     # Prompt the user to enter the drive number they want to format
     $driveNumber = Read-Host -Prompt "Enter the drive number you want to format (e.g., pd1, pd2)"
 
+    # Display Block Size to user
+    sg_readcap $driveNumber
+
     # Confirm with the user that the selected drive will be erased
     $confirmation = Read-Host -Prompt "WARNING: All data on $driveNumber will be erased. Type 'YES' to confirm or 'NO' to cancel"
 
@@ -71,10 +74,4 @@ do {
 } while ($repeat -eq 'YES')
 
 # To pause for a specific number of seconds
-Start-Sleep -Seconds 5
-
-# Wait for user to press any key to exit
-Write-Host "`n"
-Write-Host "`n"
-Write-Host "Press any key to exit..."
-$x = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
+Start-Sleep -Seconds 2
