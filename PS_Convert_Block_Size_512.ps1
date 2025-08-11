@@ -35,34 +35,40 @@ $drives = & sg_scan
 Write-Host "Drives detected:"
 $drives -split "`n" | ForEach-Object { Write-Host $_ }
 
-# Prompt the user to enter the drive number they want to format
-$driveNumber = Read-Host -Prompt "Enter the drive number you want to format (e.g., pd1, pd2)"
+do {
+    # Prompt the user to enter the drive number they want to format
+    $driveNumber = Read-Host -Prompt "Enter the drive number you want to format (e.g., pd1, pd2)"
 
-# Confirm with the user that the selected drive will be erased
-$confirmation = Read-Host -Prompt "WARNING: All data on $driveNumber will be erased. Type 'YES' to confirm or 'NO' to cancel"
+    # Confirm with the user that the selected drive will be erased
+    $confirmation = Read-Host -Prompt "WARNING: All data on $driveNumber will be erased. Type 'YES' to confirm or 'NO' to cancel"
 
-if ($confirmation -eq 'YES') {
-    # Format the selected drive
-    Write-Host "Formatting the drive $driveNumber..."
-    & sg_format --format --size=512 -v $driveNumber
+    if ($confirmation -eq 'YES') {
+        # Format the selected drive
+        Write-Host "Formatting the drive $driveNumber..."
+        & sg_format --format --size=512 -v $driveNumber
 
-    # Confirm the process is complete
-    Write-Host "Drive $driveNumber has been reformatted. Now removing read-only and initializing disk as GPT."
+        # Confirm the process is complete
+        Write-Host "Drive $driveNumber has been reformatted. Now removing read-only and initializing disk as GPT."
 
-    # Set the disk to not read-only
-    $disk = Get-Disk | Where-Object { $_.Number -eq $driveNumber.Substring(2) }
-    Set-Disk -Number $disk.Number -IsReadOnly $false
+        # Set the disk to not read-only
+        $disk = Get-Disk | Where-Object { $_.Number -eq $driveNumber.Substring(2) }
+        Set-Disk -Number $disk.Number -IsReadOnly $false
 
-    # Initialize the disk with GPT partition style
-    Initialize-Disk -Number $disk.Number -PartitionStyle GPT
+        # Initialize the disk with GPT partition style
+        Initialize-Disk -Number $disk.Number -PartitionStyle GPT
 
-    Write-Host "`n"
-    Write-Host "Drive $driveNumber has been initialized with a GPT partition style. The disk is now ready to use!"
-    Write-Host "NOTE: You may need to physically pull and reseat the drive before it will be storage pool ready." -ForegroundColor Yellow
-} else {
-    # Cancel the operation
-    Write-Host "Operation cancelled. $driveNumber was not formatted."
-}
+        Write-Host "`n"
+        Write-Host "Drive $driveNumber has been initialized with a GPT partition style. The disk is now ready to use!"
+        Write-Host "NOTE: You may need to physically pull and reseat the drive before it will be storage pool ready." -ForegroundColor Yellow
+    } else {
+        # Cancel the operation
+        Write-Host "Operation cancelled. $driveNumber was not formatted."
+    }
+
+    # Ask if the user wants to format another drive
+    $repeat = Read-Host -Prompt "Would you like to format another drive? Type 'YES' to continue or 'NO' to exit"
+
+} while ($repeat -eq 'YES')
 
 # To pause for a specific number of seconds
 Start-Sleep -Seconds 5
