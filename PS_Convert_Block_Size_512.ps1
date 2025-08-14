@@ -11,7 +11,6 @@ function Check-SGFormat {
 function Install-SGFormat {
     Write-Host "Installing sg_format..."
     if ($PSVersionTable.PSVersion.Major -ge 5) {
-        # Use PowerShellGet to install sg_format on Windows if available
         Install-Package sg3_utils
     } else {
         Write-Host "Automatic installation is not supported on this version of PowerShell. Please install sg3_utils manually."
@@ -25,53 +24,57 @@ if (-not (Check-SGFormat)) {
     Write-Host "sg_format is already installed."
 }
 
-# Display scanning message
 Write-Host "Scanning..."
-
-# Run sg_scan and store the output
 $drives = & sg_scan
 
-# Display the list of drives with each drive on a new line
 Write-Host "Drives detected:"
 $drives -split "`n" | ForEach-Object { Write-Host $_ }
 
 do {
-    # Prompt the user to enter the drive number they want to format
-    $driveNumber = Read-Host -Prompt "Enter the drive number you want to format (e.g., pd1, pd2)"
+    $driveId = Read-Host -Prompt "Enter the drive ID to format (e.g., pd1, pd2)"
+    sg_readcap $driveId
 
-    # Display Block Size to user
-    sg_readcap $driveNumber
-
-    # Confirm with the user that the selected drive will be erased
-    $confirmation = Read-Host -Prompt "WARNING: All data on $driveNumber will be erased. Type 'YES' to confirm or 'NO' to cancel"
+    $confirmation = Read-Host -Prompt "WARNING: All data on $driveId will be erased. Type 'YES' to confirm or 'NO' to cancel"
 
     if ($confirmation -eq 'YES') {
-        # Format the selected drive
-        Write-Host "Formatting the drive $driveNumber..."
-        & sg_format --format --size=512 -v $driveNumber
+        Write-Host "Formatting $driveId to 512 block size..."
+        & sg_format --format --size=512 -v $driveId
 
-        # Confirm the process is complete
-        Write-Host "Drive $driveNumber has been reformatted. Now removing read-only and initializing disk as GPT."
+        # Extract disk number from sg_scan ID (e.g., pd1 ? 1)
+        $diskNum = $driveId -replace '[^\d]', ''
 
-        # Set the disk to not read-only
-        $disk = Get-Disk | Where-Object { $_.Number -eq $driveNumber.Substring(2) }
-        Set-Disk -Number $disk.Number -IsReadOnly $false
+        # Set disk to not read-only
+        Set-Disk -Number $diskNum -IsReadOnly $false
 
-        # Initialize the disk with GPT partition style
-        Initialize-Disk -Number $disk.Number -PartitionStyle GPT
+        # Initialize as GPT (optional if you want to use outside Storage Spaces)
+        Initialize-Disk -Number $diskNum -PartitionStyle GPT
 
-        Write-Host "`n"
-        Write-Host "Drive $driveNumber has been initialized with a GPT partition style. The disk is now ready to use!"
-        Write-Host "NOTE: You may need to physically pull and reseat the drive before it will be storage pool ready." -ForegroundColor Yellow
+        # Convert to RAW if needed
+        $diskInfo = Get-Disk -Number $diskNum
+        if ($diskInfo.PartitionStyle -ne 'RAW') {
+            Clear-Disk -Number $diskNum -RemoveData -Confirm:$false
+            Write-Host "Disk $diskNum wiped and set to RAW."
+        } else {
+            Write-Host "Disk $diskNum is already RAW. Skipping wipe."
+        }
+
+        # Reset Storage Spaces metadata
+        $physDisk = Get-PhysicalDisk | Where-Object { ($_.DeviceId -eq $diskNum) -and ($_.Usage -eq 'Auto-Select') }
+        if ($physDisk) {
+            try {
+                Reset-PhysicalDisk -FriendlyName $physDisk.FriendlyName -ErrorAction Stop
+                Write-Host "Metadata reset completed."
+            } catch {
+                Write-Host "Metadata reset skipped or not applicable: $($_.Exception.Message)"
+            }
+        }
+
+        Write-Host "`nNOTE: $driveId should now show as "CanPool" and ready for windows pooling, or whatever you have in mind for it!" -ForegroundColor Yellow
     } else {
-        # Cancel the operation
-        Write-Host "Operation cancelled. $driveNumber was not formatted."
+        Write-Host "Operation cancelled. $driveId was not formatted."
     }
 
-    # Ask if the user wants to format another drive
     $repeat = Read-Host -Prompt "Would you like to format another drive? Type 'YES' to continue or 'NO' to exit"
-
 } while ($repeat -eq 'YES')
 
-# To pause for a specific number of seconds
 Start-Sleep -Seconds 2
